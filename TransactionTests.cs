@@ -152,6 +152,19 @@ namespace payrollCaseStudy
             Assert.That(sc.Amount, Is.EqualTo(12.95m));
         }
 
+        [Test]
+        public void TestChangeNameTransaction()
+        {
+            int empId = 2;
+            AddHourlyEmployee t = new AddHourlyEmployee(empId, "Bob", "Home", 12.99m);
+            t.Execute();
+            ChangeEmployeeTransaction cnt = new ChangeNameTransaction(empId, "Bill");
+            cnt.Execute();
+
+            Employee e = PayrollDatabase.GetEmployee(empId);
+            Assert.That(e, Is.Not.Null);
+            Assert.That(e.Name, Is.EqualTo("Bill"));
+        }
 
     }
 }
