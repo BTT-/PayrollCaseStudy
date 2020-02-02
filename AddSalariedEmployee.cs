@@ -1,23 +1,22 @@
 namespace payrollCaseStudy
 {
-    public class AddSalariedEmployee : Transaction
+    public class AddSalariedEmployee : AddEmployeeTransaction
     {
-        int EmpId {get; set;}
-        string Name {get; set;}
-        string Address {get; set;}
-        PaymentClassification Classification {get; set;}
-        PaymentSchedule Schedule {get; set;}
-        PaymentMethod Method {get; set;}
-        public AddSalariedEmployee(int empId, string name, string address, decimal salary)
+        private readonly decimal salary;
+        public AddSalariedEmployee(int empId, string name, string address, decimal salary) : base(empId, name, address)
         {
-            EmpId = empId;
-            Name = name;
-            Address = address;
+            this.salary = salary;
         }
 
-        public void Execute(){
-
+        protected override PaymentSchedule MakePaymentSchedule()
+        {
+            return new MonthlySchedule();
         }
+        protected override PaymentClassification MakePaymentClassification()
+        {
+            return new SalariedClassification(salary);
+        }
+
 
 
     }

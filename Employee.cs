@@ -9,7 +9,13 @@ namespace payrollCaseStudy
         public PaymentSchedule Schedule {get; set;}
         public PaymentMethod Method {get; set;}
 
-        
+        public Employee(int empId, string name, string address)
+        {
+            EmpId = empId;
+            Name = name;
+            Address = address;
+        }
+
 
     }
 }
