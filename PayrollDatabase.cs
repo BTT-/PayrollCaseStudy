@@ -4,6 +4,7 @@ namespace payrollCaseStudy
     public class PayrollDatabase
     {
         private static Hashtable employees = new Hashtable();
+        private static Hashtable unionmembers = new Hashtable();
         public static void AddEmployee(int id, Employee employee)
         {
             employees[id] = employee;
@@ -17,6 +18,16 @@ namespace payrollCaseStudy
         public static void DeleteEmployee(int id)
         {
             employees[id] = null;
+        }
+
+        public static void AddUnionMember(int memberId, int empId)
+        {
+            unionmembers[memberId] = empId;
+        }
+
+        public static Employee GetUnionMember(int memberId)
+        {
+            return employees[unionmembers[memberId]] as Employee;
         }
 
     }
