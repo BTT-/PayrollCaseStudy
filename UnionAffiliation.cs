@@ -10,6 +10,9 @@ namespace payrollCaseStudy
 
         private readonly int memberId;
 
+        public int MemberId{
+            get { return memberId; }
+        }
         public decimal Dues{
             get { return dues; }
         }

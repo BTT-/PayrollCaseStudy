@@ -25,6 +25,11 @@ namespace payrollCaseStudy
             unionmembers[memberId] = empId;
         }
 
+        public static void RemoveUnionMember(int memberId)
+        {
+            unionmembers[memberId] = null;
+        }
+
         public static Employee GetUnionMember(int memberId)
         {
             if(unionmembers[memberId] != null)
