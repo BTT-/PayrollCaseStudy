@@ -31,7 +31,7 @@ namespace payrollCaseStudy
         [Test]
         public void TestAddHourlyEmployee()
         {
-            int empId = 1;
+            int empId = 2;
             AddEmployeeTransaction t = new AddHourlyEmployee(empId, "Bob", "Home", 12.75m);
             t.Execute();
             Employee e = PayrollDatabase.GetEmployee(empId);
@@ -48,10 +48,10 @@ namespace payrollCaseStudy
             Assert.That(pm is HoldMethod, Is.True);
         }
 
-                [Test]
+        [Test]
         public void TestCommissionedEmployee()
         {
-            int empId = 1;
+            int empId = 3;
             AddEmployeeTransaction t = new AddCommissionedEmployee(empId, "Bob", "Home", 1000.00m, 0.1m);
             t.Execute();
             Employee e = PayrollDatabase.GetEmployee(empId);
@@ -68,6 +68,25 @@ namespace payrollCaseStudy
             PaymentMethod pm = e.Method;
             Assert.That(pm is HoldMethod, Is.True);
         }
+
+        [Test]
+        public void TestDeleteEmployee()
+        {
+            int empId = 4;
+            AddCommissionedEmployee t = new AddCommissionedEmployee(empId, "Bill", "Home", 2500m, 3.2m);
+            t.Execute();
+
+            Employee e  = PayrollDatabase.GetEmployee(empId);
+            Assert.That(e, Is.Not.Null);
+
+            DeleteEmployeeTransaction dt = new DeleteEmployeeTransaction(empId);
+            dt.Execute();
+
+            e = PayrollDatabase.GetEmployee(empId);
+            Assert.That(e, Is.Null);
+
+        }
+
 
     }
 }
