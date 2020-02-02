@@ -9,7 +9,7 @@ namespace payrollCaseStudy
         public void TestAddSalariedEmployee()
         {
             int empId = 1;
-            AddSalariedEmployee t = new AddSalariedEmployee(empId, "Bob", "Home", 1000);
+            AddEmployeeTransaction t = new AddSalariedEmployee(empId, "Bob", "Home", 1000);
             t.Execute();
             Employee e = PayrollDatabase.GetEmployee(empId);
             Assert.That(e.Name, Is.EqualTo("Bob"));
@@ -26,5 +26,26 @@ namespace payrollCaseStudy
             
         }
         
+       [Test]
+        public void TestAddHourlyEmployee()
+        {
+            int empId = 1;
+            AddEmployeeTransaction t = new AddHourlyEmployee(empId, "Bob", "Home", 12.75m);
+            t.Execute();
+            Employee e = PayrollDatabase.GetEmployee(empId);
+            Assert.That(e.Name, Is.EqualTo("Bob"));
+
+            PaymentClassification pc = e.Classification;
+            Assert.That(pc is HourlyClassification, Is.True);
+            HourlyClassification hc = pc as HourlyClassification;
+            Assert.That(hc.HourlyRate, Is.EqualTo(12.75m));
+            PaymentSchedule ps = e.Schedule;
+            Assert.That(ps is WeeklySchedule, Is.True);
+
+            PaymentMethod pm = e.Method;
+            Assert.That(pm is HoldMethod, Is.True);
+            
+        }
+
     }
 }
