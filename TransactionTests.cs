@@ -1,3 +1,5 @@
+using System.Runtime.CompilerServices;
+using System.Reflection;
 using NUnit.Framework;
 
 namespace payrollCaseStudy
@@ -26,7 +28,7 @@ namespace payrollCaseStudy
             
         }
         
-       [Test]
+        [Test]
         public void TestAddHourlyEmployee()
         {
             int empId = 1;
@@ -44,7 +46,27 @@ namespace payrollCaseStudy
 
             PaymentMethod pm = e.Method;
             Assert.That(pm is HoldMethod, Is.True);
-            
+        }
+
+                [Test]
+        public void TestCommissionedEmployee()
+        {
+            int empId = 1;
+            AddEmployeeTransaction t = new AddCommissionedEmployee(empId, "Bob", "Home", 1000.00m, 0.1m);
+            t.Execute();
+            Employee e = PayrollDatabase.GetEmployee(empId);
+            Assert.That(e.Name, Is.EqualTo("Bob"));
+
+            PaymentClassification pc = e.Classification;
+            Assert.That(pc is CommissionedClassification, Is.True);
+            CommissionedClassification cc = pc as CommissionedClassification;
+            Assert.That(cc.Salary, Is.EqualTo(1000.00m));
+            Assert.That(cc.CommissionRate, Is.EqualTo(0.1m));
+            PaymentSchedule ps = e.Schedule;
+            Assert.That(ps is BiWeeklySchedule, Is.True);
+
+            PaymentMethod pm = e.Method;
+            Assert.That(pm is HoldMethod, Is.True);
         }
 
     }
