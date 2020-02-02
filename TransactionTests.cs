@@ -129,7 +129,27 @@ namespace payrollCaseStudy
             SalesReceipt sr = cc.GetSalesReceipt(new DateTime(2020, 02, 02));
             Assert.That(sr, Is.Not.Null);
             Assert.That(sr.Amount, Is.EqualTo(500000m));
+        }
 
+        [Test]
+        public void TestAddServiceCharge()
+        {
+            int empId = 2;
+            AddHourlyEmployee t = new AddHourlyEmployee(empId, "Bill", "Home", 15.75m);
+            t.Execute();
+            Employee e = PayrollDatabase.GetEmployee(empId);
+            Assert.That(e, Is.Not.Null);
+
+            UnionAffiliation ua = new UnionAffiliation();
+            e.Affiliation = ua;
+            int memberId = 86;
+            PayrollDatabase.AddUnionMember(memberId, empId);
+
+            ServiceChargeTransaction sct = new ServiceChargeTransaction(memberId, new DateTime(2020,02,02), 12.95m);
+            sct.Execute();
+            ServiceCharge sc = ua.GetServiceCharge(new DateTime(2020,02,02));
+            Assert.That(sc, Is.Not.Null);
+            Assert.That(sc.Amount, Is.EqualTo(12.95m));
         }
 
 
