@@ -1,3 +1,4 @@
+using System;
 using System.Runtime.CompilerServices;
 using System.Reflection;
 using NUnit.Framework;
@@ -84,6 +85,29 @@ namespace payrollCaseStudy
 
             e = PayrollDatabase.GetEmployee(empId);
             Assert.That(e, Is.Null);
+
+        }
+
+        [Test]
+        public void TestTimeCardTransaction()
+        {
+            int empId = 5;
+            AddHourlyEmployee t = new AddHourlyEmployee(empId, "Bill", "Home", 15.25m);
+            t.Execute();
+
+            TimeCardTransaction tct = new TimeCardTransaction(new DateTime(2020, 02, 02), 8.0, empId);
+            tct.Execute();
+
+            Employee e = PayrollDatabase.GetEmployee(empId);
+            Assert.That(e, Is.Not.Null);
+
+            PaymentClassification pc = e.Classification;
+            Assert.That(pc is HourlyClassification, Is.True);
+            HourlyClassification hc = pc as HourlyClassification;
+            TimeCard tc = hc.GetTimeCard(new DateTime(2020, 02, 02));
+            Assert.That(tc, Is.Not.Null);
+            Assert.That(tc.Hours, Is.EqualTo(8.0));
+
 
         }
 
