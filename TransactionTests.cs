@@ -227,5 +227,26 @@ namespace payrollCaseStudy
             Assert.That(ps is BiWeeklySchedule);
         }
 
+        [Test]
+        public void TestChangeUnionMember()
+        {
+            int empId = 8;
+            AddHourlyEmployee t = new AddHourlyEmployee(empId, "Lance", "Home", 13.37m);
+            t.Execute();
+            int memberId = 7742;
+            ChangeMemberTransaction cmt = new ChangeMemberTransaction(empId, memberId, 99.42);
+            cmt.Execute();
+            Employee e = PayrollDatabase.GetEmployee(empId);
+            Assert.That(e, Is.Not.Null);
+            Affiliation affiliation = e.Affiliation;
+            Assert.That(affiliation, Is.Not.Null);
+            Assert.That(affiliation is UnionAffiliation);
+            UnionAffiliation ua = affiliation as UnionAffiliation;
+            Assert.That(ua.Dues, Is.EqualTo(99.42m));
+            Employee member = PayrollDatabase.GetUnionMember(memberId);
+            Assert.That(member, Is.Not.Null);
+            Assert.That(e, Is.EqualTo(member));
+        }
+
     }
 }
