@@ -166,5 +166,26 @@ namespace payrollCaseStudy
             Assert.That(e.Name, Is.EqualTo("Bill"));
         }
 
+        [Test]
+        public void TestChangeHourlyTransaction()
+        {
+            int empId = 3;
+            AddCommissionedEmployee t = new AddCommissionedEmployee(empId, "Bob", "Home", 2500m, 3.4m);
+            t.Execute();
+
+            ChangeHourlyTransaction cht = new ChangeHourlyTransaction(empId, 27.52m);
+            cht.Execute();
+            Employee e = PayrollDatabase.GetEmployee(empId);
+            Assert.That(e, Is.Not.Null);
+            PaymentClassification pc = e.Classification;
+            Assert.That(pc, Is.Not.Null);
+            Assert.That(pc is HourlyClassification, Is.True);
+            HourlyClassification hc = pc as HourlyClassification;
+            Assert.That(hc.HourlyRate, Is.EqualTo(27.52m));
+            PaymentSchedule ps = e.Schedule;
+            Assert.That(ps is WeeklySchedule);
+
+        }
+
     }
 }
