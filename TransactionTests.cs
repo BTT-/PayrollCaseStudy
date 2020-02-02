@@ -109,6 +109,29 @@ namespace payrollCaseStudy
             Assert.That(tc.Hours, Is.EqualTo(8.0));
         }
 
+        [Test]
+        public void TestSalesReceiptTransaction()
+        {
+            int empId = 6;
+            AddCommissionedEmployee t = new AddCommissionedEmployee(empId, "Bill", "Home", 2500m, 3.5m);
+            t.Execute();
+
+            SalesReceiptTransaction srt = new SalesReceiptTransaction(new DateTime(2020, 02, 02), 500000m, empId);
+            srt.Execute();
+
+            Employee e = PayrollDatabase.GetEmployee(empId);
+            Assert.That(e, Is.Not.Null);
+
+            PaymentClassification pc = e.Classification;
+            Assert.That(pc is CommissionedClassification, Is.True);
+            CommissionedClassification cc = pc as CommissionedClassification;
+
+            SalesReceipt sr = cc.GetSalesReceipt(new DateTime(2020, 02, 02));
+            Assert.That(sr, Is.Not.Null);
+            Assert.That(sr.Amount, Is.EqualTo(500000m));
+
+        }
+
 
     }
 }
