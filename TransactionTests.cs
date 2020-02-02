@@ -206,5 +206,26 @@ namespace payrollCaseStudy
             Assert.That(ps is MonthlySchedule);
         }
 
+        [Test]
+        public void TestChangeCommissionedTransaction()
+        {
+            int empId = 3;
+            AddSalariedEmployee t = new AddSalariedEmployee(empId, "Bob", "Home", 3000m);
+            t.Execute();
+
+            ChangeClassificationTransaction cht = new ChangeCommissionedTransaction(empId, 2500m, 3.4m);
+            cht.Execute();
+            Employee e = PayrollDatabase.GetEmployee(empId);
+            Assert.That(e, Is.Not.Null);
+            PaymentClassification pc = e.Classification;
+            Assert.That(pc, Is.Not.Null);
+            Assert.That(pc is CommissionedClassification, Is.True);
+            CommissionedClassification cc = pc as CommissionedClassification;
+            Assert.That(cc.Salary, Is.EqualTo(2500m));
+            Assert.That(cc.CommissionRate, Is.EqualTo(3.4m));
+            PaymentSchedule ps = e.Schedule;
+            Assert.That(ps is BiWeeklySchedule);
+        }
+
     }
 }
