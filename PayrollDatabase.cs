@@ -13,5 +13,11 @@ namespace payrollCaseStudy
         {
             return employees[id] as Employee;
         }
+
+        public static void DeleteEmployee(int id)
+        {
+            employees[id] = null;
+        }
+
     }
 }
