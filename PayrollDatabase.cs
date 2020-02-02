@@ -27,7 +27,11 @@ namespace payrollCaseStudy
 
         public static Employee GetUnionMember(int memberId)
         {
-            return employees[unionmembers[memberId]] as Employee;
+            if(unionmembers[memberId] != null)
+            {
+                return employees[unionmembers[memberId]] as Employee;
+            }
+            return null;
         }
 
     }

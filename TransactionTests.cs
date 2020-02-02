@@ -234,8 +234,8 @@ namespace payrollCaseStudy
             AddHourlyEmployee t = new AddHourlyEmployee(empId, "Lance", "Home", 13.37m);
             t.Execute();
             int memberId = 7742;
-            ChangeMemberTransaction cmt = new ChangeMemberTransaction(empId, memberId, 99.42);
-            cmt.Execute();
+            ChangeAffiliationTransaction cat = new ChangeMemberTransaction(empId, memberId, 99.42m);
+            cat.Execute();
             Employee e = PayrollDatabase.GetEmployee(empId);
             Assert.That(e, Is.Not.Null);
             Affiliation affiliation = e.Affiliation;
@@ -247,6 +247,28 @@ namespace payrollCaseStudy
             Assert.That(member, Is.Not.Null);
             Assert.That(e, Is.EqualTo(member));
         }
+
+        [Test]
+        public void TestChangeNoAffiliation()
+        {
+            int empId = 8;
+            AddHourlyEmployee t = new AddHourlyEmployee(empId, "Lance", "Home", 13.37m);
+            t.Execute();
+            int memberId = 7742;
+            ChangeAffiliationTransaction cat = new ChangeMemberTransaction(empId, memberId, 99.42m);
+            cat.Execute();
+            ChangeAffiliationTransaction cuat = new ChangeUnaffiliatedTransaction(empId);
+            cuat.Execute();
+            Employee e = PayrollDatabase.GetEmployee(empId);
+            Assert.That(e, Is.Not.Null);
+            Affiliation affiliation = e.Affiliation;
+            Assert.That(affiliation, Is.Not.Null);
+            Assert.That(affiliation is NoAffiliation);
+            NoAffiliation na = affiliation as NoAffiliation;
+            Employee member = PayrollDatabase.GetUnionMember(memberId);
+            Assert.That(member, Is.Null);
+        }
+
 
     }
 }

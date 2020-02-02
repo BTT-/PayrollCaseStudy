@@ -6,10 +6,23 @@ namespace payrollCaseStudy
     {
 
         private Hashtable servicecharges;
+        private decimal dues;
+
+        private readonly int memberId;
+
+        public decimal Dues{
+            get { return dues; }
+        }
 
         public UnionAffiliation()
         {
             servicecharges = new Hashtable();
+        }
+
+        public UnionAffiliation(int memberId, decimal dues) : this()
+        {
+            this.dues = dues;
+            this.memberId = memberId;
         }
 
         public void AddServiceCharge(ServiceCharge sc)
