@@ -107,8 +107,6 @@ namespace payrollCaseStudy
             TimeCard tc = hc.GetTimeCard(new DateTime(2020, 02, 02));
             Assert.That(tc, Is.Not.Null);
             Assert.That(tc.Hours, Is.EqualTo(8.0));
-
-
         }
 
 
