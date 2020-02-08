@@ -269,6 +269,22 @@ namespace payrollCaseStudy
             Assert.That(member, Is.Null);
         }
 
+        [Test]
+        public void TestPaySingleSalariedEmployee()
+        {
+            int empId = 1;
+            AddSalariedEmployee t = new AddSalariedEmployee(empId, "Bob", "Home", 1000.00m);
+            t.Execute();
+            DateTime payDate = new DateTime(2020, 11, 30);
+            PaydayTransaction pt = new PaydayTransaction(payDate);
+            pt.Execute();
+            Paycheck pc = pt.GetPaycheck(empId);
+            Assert.That(pc, Is.Not.Null);
+            Assert.That(pc.PayDate, Is.EqualTo(payDate));
+            Assert.That(pc.GrossPay, Is.EqualTo(1000.00m));
+            Assert.That(pc.Deductions, Is.EqualTo(0.00m));
+            Assert.That(pc.NetPay, Is.EqualTo(1000.00m));
+        }
 
     }
 }
