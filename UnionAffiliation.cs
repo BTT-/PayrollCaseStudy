@@ -37,5 +37,11 @@ namespace payrollCaseStudy
         {
             return servicecharges[date] as ServiceCharge;
         }
+
+        public decimal CalculateDeductions(Paycheck paycheck)
+        {
+            return 0.0m;
+        }
+
     }
 }

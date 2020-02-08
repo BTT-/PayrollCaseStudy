@@ -1,3 +1,5 @@
+using System;
+
 namespace payrollCaseStudy
 {
     public class Employee
@@ -16,6 +18,22 @@ namespace payrollCaseStudy
             Name = name;
             Address = address;
             Affiliation = new NoAffiliation();
+        }
+
+        public void Payday(Paycheck paycheck)
+        {
+            decimal grossPay = Classification.CalculatePay(paycheck);
+            decimal deductions = Affiliation.CalculateDeductions(paycheck);
+            decimal netPay = grossPay - deductions;
+            paycheck.GrossPay = grossPay;
+            paycheck.Deductions = deductions;
+            paycheck.NetPay = netPay;
+            Method.Pay(paycheck);
+        }
+
+        public bool IsPayDay(DateTime payDate)
+        {
+            return Schedule.IsPayDay(payDate);
         }
 
 

@@ -24,5 +24,10 @@ namespace payrollCaseStudy
             timeCards[timeCard.Date] = timeCard;
         }
 
+        public decimal CalculatePay(Paycheck paycheck)
+        {
+            return 0m;
+        }
+
     }
 }

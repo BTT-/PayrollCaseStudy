@@ -8,5 +8,11 @@ namespace payrollCaseStudy
         {
             Salary = salary;
         }
+
+        public decimal CalculatePay(Paycheck paycheck)
+        {
+            return Salary;
+        }
+
     }
 }

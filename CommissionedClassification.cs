@@ -26,6 +26,10 @@ namespace payrollCaseStudy
             salesReceipts[receipt.Date] = receipt;
         }
 
+        public decimal CalculatePay(Paycheck paycheck)
+        {
+            return 0.0m;
+        }
 
     }
 }

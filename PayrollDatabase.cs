@@ -10,6 +10,11 @@ namespace payrollCaseStudy
             employees[id] = employee;
         }
 
+        public static ArrayList GetEmployeeIds()
+        {
+            return new ArrayList(employees.Keys);
+        }
+
         public static Employee GetEmployee(int id)
         {
             return employees[id] as Employee;
