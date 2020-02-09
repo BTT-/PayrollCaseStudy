@@ -1,6 +1,4 @@
 using System;
-using System.Runtime.CompilerServices;
-using System.Reflection;
 using NUnit.Framework;
 
 namespace payrollCaseStudy
@@ -297,6 +295,28 @@ namespace payrollCaseStudy
             pt.Execute();
             Paycheck pc = pt.GetPaycheck(empId);
             Assert.That(pc, Is.Null);
+        }
+
+        [Test]
+        public void TestPaySinglHourlyEmployeeNoTimeCards()
+        {
+            int empId = 2;
+            AddHourlyEmployee t = new AddHourlyEmployee(empId, "Bill", "Home", 15.25m);
+            t.Execute();
+            DateTime payDate = new DateTime(2020, 2, 7);
+            PaydayTransaction pt = new PaydayTransaction(payDate);
+            pt.Execute();
+            ValidateHourlyPaycheck(pt, empId, payDate, 0.0m);
+        }
+
+        private void ValidateHourlyPaycheck(PaydayTransaction pt, int empId, DateTime payDate, decimal pay)
+        {
+            Paycheck pc = pt.GetPaycheck(empId);
+            Assert.That(pc, Is.Not.Null);
+            Assert.That(pc.PayDate, Is.EqualTo(payDate));
+            Assert.That(pc.GrossPay, Is.EqualTo(pay));
+            Assert.That(pc.Deductions, Is.EqualTo(0.0m));
+            Assert.That(pc.NetPay, Is.EqualTo(pay));
         }
     }
 }
