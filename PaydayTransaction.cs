@@ -19,7 +19,6 @@ namespace payrollCaseStudy
             var empIds = PayrollDatabase.GetEmployeeIds();
             foreach(int empId in empIds)
             {
-                Console.WriteLine($"empId {empId}");
                 var e = PayrollDatabase.GetEmployee(empId);
                 if(e.IsPayDay(payDate))
                 {

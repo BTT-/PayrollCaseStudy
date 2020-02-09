@@ -325,6 +325,22 @@ namespace payrollCaseStudy
             ValidateHourlyPaycheck(pt, empId, payDate, 30.5m);
         }
 
+        [Test]
+        public void TestPaySingleHourlyEmployeeOvertimeOneTimeCard()
+        {
+            int empId = 2;
+            AddHourlyEmployee t = new AddHourlyEmployee(empId, "Bill", "home", 15.25m);
+            t.Execute();
+            DateTime payDate = new DateTime(2020, 2, 7);
+
+            TimeCardTransaction tct = new TimeCardTransaction(payDate, 9.0, empId);
+            tct.Execute();
+
+            PaydayTransaction pt = new PaydayTransaction(payDate);
+            pt.Execute();
+            ValidateHourlyPaycheck(pt, empId, payDate, (8m + 1.5m) * 15.25m);
+        }
+
         private void ValidateHourlyPaycheck(PaydayTransaction pt, int empId, DateTime payDate, decimal pay)
         {
             Paycheck pc = pt.GetPaycheck(empId);
