@@ -298,7 +298,7 @@ namespace payrollCaseStudy
         }
 
         [Test]
-        public void TestPaySinglHourlyEmployeeNoTimeCards()
+        public void TestPaySingleHourlyEmployeeNoTimeCards()
         {
             int empId = 2;
             AddHourlyEmployee t = new AddHourlyEmployee(empId, "Bill", "Home", 15.25m);
@@ -307,6 +307,22 @@ namespace payrollCaseStudy
             PaydayTransaction pt = new PaydayTransaction(payDate);
             pt.Execute();
             ValidateHourlyPaycheck(pt, empId, payDate, 0.0m);
+        }
+
+        [Test]
+        public void TestPaySingleHourlyEmployeeOneTimeCard()
+        {
+            int empId = 2;
+            AddHourlyEmployee t = new AddHourlyEmployee(empId, "Bill", "home", 15.25m);
+            t.Execute();
+            DateTime payDate = new DateTime(2020, 2, 7);
+
+            TimeCardTransaction tct = new TimeCardTransaction(payDate, 2.0, empId);
+            tct.Execute();
+
+            PaydayTransaction pt = new PaydayTransaction(payDate);
+            pt.Execute();
+            ValidateHourlyPaycheck(pt, empId, payDate, 30.5m);
         }
 
         private void ValidateHourlyPaycheck(PaydayTransaction pt, int empId, DateTime payDate, decimal pay)
