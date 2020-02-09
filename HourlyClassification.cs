@@ -31,11 +31,23 @@ namespace payrollCaseStudy
             {
                 if(IsInPayPeriod(tc, paycheck.PayDate))
                 {
-                    result += Convert.ToDecimal(tc.Hours) * HourlyRate;
+                    decimal overtimeHours = CalculateOvertimeHours(tc);
+                    decimal regularHours = CalculateRegularHours(tc, overtimeHours);
+                    result += (regularHours + 1.5m * overtimeHours) * HourlyRate;
                 }
             }
 
             return result;
+        }
+
+        private decimal CalculateOvertimeHours(TimeCard tc)
+        {
+            return Convert.ToDecimal(Math.Max(0, tc.Hours-8));
+        }
+
+        private decimal CalculateRegularHours(TimeCard tc, decimal overtime)
+        {
+            return Convert.ToDecimal(tc.Hours) - overtime;
         }
 
         private bool IsInPayPeriod(TimeCard tc, DateTime payDate)
