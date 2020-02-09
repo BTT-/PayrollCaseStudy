@@ -6,7 +6,12 @@ namespace payrollCaseStudy
     {
         public bool IsPayDay(DateTime payDate)
         {
-            return false;
-        }   
+            return IsFriday(payDate);
+        }
+
+        private static bool IsFriday(DateTime payDate)
+        {
+            return payDate.DayOfWeek.Equals(DayOfWeek.Friday);
+        }
     }
 }
