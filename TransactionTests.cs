@@ -341,6 +341,59 @@ namespace payrollCaseStudy
             ValidateHourlyPaycheck(pt, empId, payDate, (8m + 1.5m) * 15.25m);
         }
 
+        [Test]
+        public void TestPaySingleHourlyEmployeeOnWrongDate()
+        {
+            int empId = 2;
+            AddHourlyEmployee t = new AddHourlyEmployee(empId, "Bill", "home", 15.25m);
+            t.Execute();
+            DateTime payDate = new DateTime(2020, 2, 6);
+
+            TimeCardTransaction tct = new TimeCardTransaction(payDate, 2.0, empId);
+            tct.Execute();
+
+            PaydayTransaction pt = new PaydayTransaction(payDate);
+            pt.Execute();
+            Paycheck pc = pt.GetPaycheck(empId);
+            Assert.That(pc, Is.Null);
+        }
+
+        [Test]
+        public void TestPaySingleHourlyEmployeeTwoTimeCards()
+        {
+            int empId = 2;
+            AddHourlyEmployee t = new AddHourlyEmployee(empId, "Bill", "home", 15.25m);
+            t.Execute();
+            DateTime payDate = new DateTime(2020, 2, 7);
+
+            TimeCardTransaction tct = new TimeCardTransaction(payDate, 2.0, empId);
+            tct.Execute();
+            TimeCardTransaction tct2 = new TimeCardTransaction(payDate.AddDays(-5), 5.0, empId);
+            tct2.Execute();
+            PaydayTransaction pt = new PaydayTransaction(payDate);
+            pt.Execute();
+            ValidateHourlyPaycheck(pt, empId, payDate, 7m * 15.25m);
+        }
+
+        [Test]
+        public void TestPaySingleHourlyEmployeeWithTimeCardSpanningTwoPayPeriods()
+        {
+            int empId = 2;
+            AddHourlyEmployee t = new AddHourlyEmployee(empId, "Bill", "home", 15.25m);
+            t.Execute();
+            DateTime payDate = new DateTime(2020, 2, 7);
+            DateTime dateInPreviousPeriod = payDate.AddDays(-7);
+
+            TimeCardTransaction tct = new TimeCardTransaction(payDate, 2.0, empId);
+            tct.Execute();
+            TimeCardTransaction tct2 = new TimeCardTransaction(dateInPreviousPeriod, 10.0, empId);
+            tct2.Execute();
+            
+            PaydayTransaction pt = new PaydayTransaction(payDate);
+            pt.Execute();
+            ValidateHourlyPaycheck(pt, empId, payDate, 30.5m);            
+        }
+
         private void ValidateHourlyPaycheck(PaydayTransaction pt, int empId, DateTime payDate, decimal pay)
         {
             Paycheck pc = pt.GetPaycheck(empId);
