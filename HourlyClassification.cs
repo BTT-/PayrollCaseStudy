@@ -26,8 +26,24 @@ namespace payrollCaseStudy
 
         public decimal CalculatePay(Paycheck paycheck)
         {
-            return 0m;
+            decimal result = 0m;
+            foreach(TimeCard tc in timeCards.Values)
+            {
+                if(IsInPayPeriod(tc, paycheck.PayDate))
+                {
+                    result += Convert.ToDecimal(tc.Hours) * HourlyRate;
+                }
+            }
+
+            return result;
         }
 
+        private bool IsInPayPeriod(TimeCard tc, DateTime payDate)
+        {
+            DateTime payPeriodStart = payDate.AddDays(-5);
+            DateTime payPeriodEnd = payDate;
+
+            return tc.Date <= payPeriodEnd && tc.Date >= payPeriodStart;
+        }
     }
 }
