@@ -276,12 +276,8 @@ namespace payrollCaseStudy
             DateTime payDate = new DateTime(2020, 11, 30);
             PaydayTransaction pt = new PaydayTransaction(payDate);
             pt.Execute();
-            Paycheck pc = pt.GetPaycheck(empId);
-            Assert.That(pc, Is.Not.Null);
-            Assert.That(pc.PayDate, Is.EqualTo(payDate));
-            Assert.That(pc.GrossPay, Is.EqualTo(1000.00m));
-            Assert.That(pc.Deductions, Is.EqualTo(0.00m));
-            Assert.That(pc.NetPay, Is.EqualTo(1000.00m));
+
+            ValidatePaycheck(pt, empId, payDate, 1000m);
         }
 
         [Test]
@@ -306,7 +302,7 @@ namespace payrollCaseStudy
             DateTime payDate = new DateTime(2020, 2, 7);
             PaydayTransaction pt = new PaydayTransaction(payDate);
             pt.Execute();
-            ValidateHourlyPaycheck(pt, empId, payDate, 0.0m);
+            ValidatePaycheck(pt, empId, payDate, 0.0m);
         }
 
         [Test]
@@ -322,7 +318,7 @@ namespace payrollCaseStudy
 
             PaydayTransaction pt = new PaydayTransaction(payDate);
             pt.Execute();
-            ValidateHourlyPaycheck(pt, empId, payDate, 30.5m);
+            ValidatePaycheck(pt, empId, payDate, 30.5m);
         }
 
         [Test]
@@ -338,7 +334,7 @@ namespace payrollCaseStudy
 
             PaydayTransaction pt = new PaydayTransaction(payDate);
             pt.Execute();
-            ValidateHourlyPaycheck(pt, empId, payDate, (8m + 1.5m) * 15.25m);
+            ValidatePaycheck(pt, empId, payDate, (8m + 1.5m) * 15.25m);
         }
 
         [Test]
@@ -372,7 +368,7 @@ namespace payrollCaseStudy
             tct2.Execute();
             PaydayTransaction pt = new PaydayTransaction(payDate);
             pt.Execute();
-            ValidateHourlyPaycheck(pt, empId, payDate, 7m * 15.25m);
+            ValidatePaycheck(pt, empId, payDate, 7m * 15.25m);
         }
 
         [Test]
@@ -391,7 +387,7 @@ namespace payrollCaseStudy
             
             PaydayTransaction pt = new PaydayTransaction(payDate);
             pt.Execute();
-            ValidateHourlyPaycheck(pt, empId, payDate, 30.5m);            
+            ValidatePaycheck(pt, empId, payDate, 30.5m);            
         }
 
         [Test]
@@ -405,15 +401,26 @@ namespace payrollCaseStudy
             PaydayTransaction pt = new PaydayTransaction(payDate);
             pt.Execute();
 
-            Paycheck pc = pt.GetPaycheck(empId);
-            Assert.That(pc, Is.Not.Null);
-            Assert.That(pc.PayDate, Is.EqualTo(payDate));
-            Assert.That(pc.GrossPay, Is.EqualTo(1000.00m));
-            Assert.That(pc.Deductions, Is.EqualTo(0.00m));
-            Assert.That(pc.NetPay, Is.EqualTo(1000.00m));
+            ValidatePaycheck(pt, empId, payDate, 1000m);
         }
 
-        private void ValidateHourlyPaycheck(PaydayTransaction pt, int empId, DateTime payDate, decimal pay)
+        [Test]
+        public void TestPaySingleCommissionedEmployeeOneReceipts()
+        {
+            int empId = 3;
+            AddCommissionedEmployee t = new AddCommissionedEmployee(empId, "Bob", "Home", 1000m, 0.5m);
+            t.Execute();
+            DateTime payDate = new DateTime(2020, 02, 21);
+            SalesReceiptTransaction srt = new SalesReceiptTransaction(payDate.AddDays(-1), 100m, empId);
+            srt.Execute();
+
+            PaydayTransaction pt = new PaydayTransaction(payDate);
+            pt.Execute();
+
+            ValidatePaycheck(pt, empId, payDate, 1000m + 0.5m * 100m);
+        }
+
+        private void ValidatePaycheck(PaydayTransaction pt, int empId, DateTime payDate, decimal pay)
         {
             Paycheck pc = pt.GetPaycheck(empId);
             Assert.That(pc, Is.Not.Null);
