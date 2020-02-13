@@ -28,7 +28,7 @@ namespace payrollCaseStudy
 
         public decimal CalculatePay(Paycheck paycheck)
         {
-            return 0.0m;
+            return Salary;
         }
 
     }
