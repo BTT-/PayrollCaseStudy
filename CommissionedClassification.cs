@@ -28,8 +28,23 @@ namespace payrollCaseStudy
 
         public decimal CalculatePay(Paycheck paycheck)
         {
-            return Salary;
+            var result = Salary;
+            foreach(SalesReceipt sr in salesReceipts.Values)
+            {
+                if(IsInPayPeriod(sr, paycheck.PayDate))
+                {
+                    result += CommissionRate * sr.Amount;
+                }
+            }
+            return result;
         }
 
+        private bool IsInPayPeriod(SalesReceipt sr, DateTime payDate)
+        {
+            DateTime payPeriodStart = payDate.AddDays(-14);
+            DateTime payPeriodEnd = payDate;
+
+            return sr.Date <= payPeriodEnd && sr.Date >= payPeriodStart;
+        }
     }
 }
