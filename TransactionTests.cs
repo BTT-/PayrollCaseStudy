@@ -394,6 +394,25 @@ namespace payrollCaseStudy
             ValidateHourlyPaycheck(pt, empId, payDate, 30.5m);            
         }
 
+        [Test]
+        public void TestPaySingleCommissionedEmployeeNoReceipts()
+        {
+            int empId = 3;
+            AddCommissionedEmployee t = new AddCommissionedEmployee(empId, "Bob", "Home", 1000m, 5m);
+            t.Execute();
+            DateTime payDate = new DateTime(2020, 02, 21);
+
+            PaydayTransaction pt = new PaydayTransaction(payDate);
+            pt.Execute();
+
+            Paycheck pc = pt.GetPaycheck(empId);
+            Assert.That(pc, Is.Not.Null);
+            Assert.That(pc.PayDate, Is.EqualTo(payDate));
+            Assert.That(pc.GrossPay, Is.EqualTo(1000.00m));
+            Assert.That(pc.Deductions, Is.EqualTo(0.00m));
+            Assert.That(pc.NetPay, Is.EqualTo(1000.00m));
+        }
+
         private void ValidateHourlyPaycheck(PaydayTransaction pt, int empId, DateTime payDate, decimal pay)
         {
             Paycheck pc = pt.GetPaycheck(empId);
