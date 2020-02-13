@@ -405,6 +405,20 @@ namespace payrollCaseStudy
         }
 
         [Test]
+        public void TestPaySingleCommissionedEmployeeWrongDate()
+        {
+            int empId = 3;
+            AddCommissionedEmployee t = new AddCommissionedEmployee(empId, "Bob", "Home", 1000m, 5m);
+            t.Execute();
+            DateTime payDate = new DateTime(2020, 02, 20);
+
+            PaydayTransaction pt = new PaydayTransaction(payDate);
+            pt.Execute();
+            var pc = pt.GetPaycheck(empId);
+            Assert.That(pc, Is.Null);
+        }
+
+        [Test]
         public void TestPaySingleCommissionedEmployeeOneReceipts()
         {
             int empId = 3;
@@ -419,6 +433,42 @@ namespace payrollCaseStudy
 
             ValidatePaycheck(pt, empId, payDate, 1000m + 0.5m * 100m);
         }
+
+        [Test]
+        public void TestPaySingleCommissionedEmployeeTwoReceipts()
+        {
+            int empId = 3;
+            AddCommissionedEmployee t = new AddCommissionedEmployee(empId, "Bob", "Home", 1000m, 0.5m);
+            t.Execute();
+            DateTime payDate = new DateTime(2020, 02, 21);
+            SalesReceiptTransaction srt = new SalesReceiptTransaction(payDate.AddDays(-1), 100m, empId);
+            srt.Execute();
+            SalesReceiptTransaction srt2 = new SalesReceiptTransaction(payDate.AddDays(-14), 100m, empId);
+            srt2.Execute();
+
+            PaydayTransaction pt = new PaydayTransaction(payDate);
+            pt.Execute();
+
+            ValidatePaycheck(pt, empId, payDate, 1000m + 0.5m * 200m);
+        }        
+
+        [Test]
+        public void TestPaySingleCommissionedEmployeeSalesReceiptSpanningTwoPeriods()
+        {
+            int empId = 3;
+            AddCommissionedEmployee t = new AddCommissionedEmployee(empId, "Bob", "Home", 1000m, 0.5m);
+            t.Execute();
+            DateTime payDate = new DateTime(2020, 02, 21);
+            SalesReceiptTransaction srt = new SalesReceiptTransaction(payDate.AddDays(-1), 100m, empId);
+            srt.Execute();
+            SalesReceiptTransaction srt2 = new SalesReceiptTransaction(payDate.AddDays(-15), 100m, empId);
+            srt2.Execute();
+
+            PaydayTransaction pt = new PaydayTransaction(payDate);
+            pt.Execute();
+
+            ValidatePaycheck(pt, empId, payDate, 1000m + 0.5m * 100m);
+        } 
 
         private void ValidatePaycheck(PaydayTransaction pt, int empId, DateTime payDate, decimal pay)
         {
