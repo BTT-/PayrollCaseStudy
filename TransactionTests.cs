@@ -494,10 +494,10 @@ namespace payrollCaseStudy
             Assert.That(pc, Is.Not.Null);
             Assert.That(pc.PayPeriodEndDate, Is.EqualTo(payDate));
             Assert.That(pc.GrossPay, Is.EqualTo(1000m));
-            
-            Assert.That(false);
-
-
+            //4 Fridays in Feb 2020
+            var unionDues = 4m*9.42m;
+            Assert.That(pc.Deductions, Is.EqualTo(unionDues));
+            Assert.That(pc.NetPay, Is.EqualTo(1000.0m - unionDues));
         }
 
         private void ValidatePaycheck(PaydayTransaction pt, int empId, DateTime payDate, decimal pay)
