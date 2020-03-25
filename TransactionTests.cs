@@ -448,15 +448,41 @@ namespace payrollCaseStudy
             AddCommissionedEmployee t = new AddCommissionedEmployee(empId, "Bob", "Home", 1000m, 0.5m);
             t.Execute();
             DateTime payDate = new DateTime(2020, 02, 21);
-            SalesReceiptTransaction srt = new SalesReceiptTransaction(payDate.AddDays(-1), 100m, empId);
+            SalesReceiptTransaction srt = new SalesReceiptTransaction(payDate, 100m, empId);
             srt.Execute();
-            SalesReceiptTransaction srt2 = new SalesReceiptTransaction(payDate.AddDays(-14), 100m, empId);
+            SalesReceiptTransaction srt2 = new SalesReceiptTransaction(payDate.AddDays(-13), 100m, empId);
             srt2.Execute();
 
             PaydayTransaction pt = new PaydayTransaction(payDate);
             pt.Execute();
 
             ValidatePaycheck(pt, empId, payDate, 1000m + 0.5m * 200m);
+        }
+
+        [Test]
+        public void TestPaySingleCommissionedEmployeeTwoPeriods()
+        {
+            int empId = 3;
+            AddCommissionedEmployee t = new AddCommissionedEmployee(empId, "Bob", "Home", 1000m, 0.5m);
+            t.Execute();
+            DateTime payDate = new DateTime(2020, 02, 21);
+            SalesReceiptTransaction srt = new SalesReceiptTransaction(payDate, 100m, empId);
+            srt.Execute();
+            SalesReceiptTransaction srt2 = new SalesReceiptTransaction(payDate.AddDays(-13), 100m, empId);
+            srt2.Execute();
+
+            PaydayTransaction pt = new PaydayTransaction(payDate);
+            pt.Execute();
+
+            ValidatePaycheck(pt, empId, payDate, 1000m + 0.5m * 200m);
+
+
+            payDate = new DateTime(2020, 03, 06);
+            pt = new PaydayTransaction(payDate);
+            pt.Execute();
+
+            ValidatePaycheck(pt, empId, payDate, 1000m);
+
         }        
 
         [Test]
@@ -478,7 +504,7 @@ namespace payrollCaseStudy
         } 
 
         [Test]
-        public void SalariedUnionMemberDues()
+        public void TestSalariedUnionMemberDues()
         {
             int empId = 1;
             var t = new AddSalariedEmployee(empId, "Bob", "Home", 1000.00m);
@@ -499,6 +525,87 @@ namespace payrollCaseStudy
             Assert.That(pc.Deductions, Is.EqualTo(unionDues));
             Assert.That(pc.NetPay, Is.EqualTo(1000.0m - unionDues));
         }
+
+        [Test]
+        public void TestSalariedUnionMemberDuesFridaysTest()
+        {
+            int empId = 1;
+            var t = new AddSalariedEmployee(empId, "Bob", "Home", 1000.00m);
+            t.Execute();
+            int memberId = 7734;
+            var cmt = new ChangeMemberTransaction(empId, memberId, 9.42m);
+            cmt.Execute();
+
+            DateTime payDate = new DateTime(2020, 01, 31);
+            var pt = new PaydayTransaction(payDate);
+            pt.Execute();
+            Paycheck pc = pt.GetPaycheck(empId);
+            Assert.That(pc, Is.Not.Null);
+            Assert.That(pc.PayPeriodEndDate, Is.EqualTo(payDate));
+            Assert.That(pc.GrossPay, Is.EqualTo(1000m));
+            //5 Fridays in Jan
+            var unionDues = 5m*9.42m;
+            Assert.That(pc.Deductions, Is.EqualTo(unionDues));
+            Assert.That(pc.NetPay, Is.EqualTo(1000.0m - unionDues));
+        }
+
+        [Test]
+        public void TestCommissionedUnionMemberDues()
+        {
+            int empId = 1;
+            var t = new AddCommissionedEmployee(empId, "Bob", "Home", 1000.00m, 1m);
+            t.Execute();
+            int memberId = 7734;
+            var cmt = new ChangeMemberTransaction(empId, memberId, 9.42m);
+            cmt.Execute();
+
+            DateTime payDate = new DateTime(2020, 01, 24);
+            var pt = new PaydayTransaction(payDate);
+            pt.Execute();
+            Paycheck pc = pt.GetPaycheck(empId);
+            Assert.That(pc, Is.Not.Null);
+            Assert.That(pc.PayPeriodEndDate, Is.EqualTo(payDate));
+            Assert.That(pc.GrossPay, Is.EqualTo(1000m));
+            //2 Fridays 
+            var unionDues = 2m*9.42m;
+            Assert.That(pc.Deductions, Is.EqualTo(unionDues));
+            Assert.That(pc.NetPay, Is.EqualTo(1000.0m - unionDues));
+
+            payDate = new DateTime(2020, 01, 10);
+            pt = new PaydayTransaction(payDate);
+            pt.Execute();
+            pc = pt.GetPaycheck(empId);
+            Assert.That(pc, Is.Not.Null);
+            Assert.That(pc.PayPeriodEndDate, Is.EqualTo(payDate));
+            Assert.That(pc.GrossPay, Is.EqualTo(1000m));
+
+            Assert.That(pc.Deductions, Is.EqualTo(unionDues));
+            Assert.That(pc.NetPay, Is.EqualTo(1000.0m - unionDues));
+        }
+
+        [Test]
+        public void TestHourlyUnionMemberDues()
+        {
+            int empId = 1;
+            var t = new AddHourlyEmployee(empId, "Bob", "Home", 12.0m);
+            t.Execute();
+            int memberId = 7734;
+            var cmt = new ChangeMemberTransaction(empId, memberId, 9.42m);
+            cmt.Execute();
+
+            DateTime payDate = new DateTime(2020, 01, 24);
+            var pt = new PaydayTransaction(payDate);
+            pt.Execute();
+            Paycheck pc = pt.GetPaycheck(empId);
+            Assert.That(pc, Is.Not.Null);
+            Assert.That(pc.PayPeriodEndDate, Is.EqualTo(payDate));
+            Assert.That(pc.GrossPay, Is.EqualTo(0m));
+            //1 Fridays 
+            var unionDues = 9.42m;
+            Assert.That(pc.Deductions, Is.EqualTo(9.42m));
+            Assert.That(pc.NetPay, Is.EqualTo(-unionDues));
+        }
+
 
         private void ValidatePaycheck(PaydayTransaction pt, int empId, DateTime payDate, decimal pay)
         {

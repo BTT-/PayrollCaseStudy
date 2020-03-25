@@ -14,7 +14,7 @@ namespace payrollCaseStudy
 
         public DateTime GetStartDate(DateTime payDate)
         {
-            return payDate.AddDays(-14);
+            return payDate.AddDays(-13);
         }
     }
 }

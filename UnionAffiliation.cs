@@ -52,7 +52,7 @@ namespace payrollCaseStudy
         private int NumberOfFridaysInPayPeriod(DateTime startDate, DateTime endDate)
         {
             int result = 0;
-            for(DateTime day = startDate; day < endDate; day = day.AddDays(1))
+            for(DateTime day = startDate; day <= endDate; day = day.AddDays(1))
             {
                 if(day.DayOfWeek == DayOfWeek.Friday) 
                     result++;
