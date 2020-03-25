@@ -41,11 +41,21 @@ namespace payrollCaseStudy
 
         public decimal CalculateDeductions(Paycheck paycheck)
         {
-            decimal result = 0.0m;
+            decimal result = CalculateBaseDues(paycheck);
+            result += CalculateServiceChargeAmount(paycheck);
 
+            return result;
+        }
+
+        private decimal CalculateBaseDues(Paycheck paycheck)
+        {
             int fridays = NumberOfFridaysInPayPeriod(paycheck.PayPeriodStartDate, paycheck.PayPeriodEndDate);
-            result = fridays * dues;
+            return fridays * dues;
+        }
 
+        private decimal CalculateServiceChargeAmount(Paycheck paycheck)
+        {
+            var result = 0m;
             foreach(ServiceCharge charge in servicecharges.Values)
             {
                 if(charge.Date.IsInPayPeriod(paycheck.PayPeriodStartDate, paycheck.PayPeriodEndDate))
@@ -53,7 +63,6 @@ namespace payrollCaseStudy
                     result += charge.Amount;
                 }
             }
-
             return result;
         }
 
