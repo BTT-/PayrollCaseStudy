@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Collections;
 using System;
 namespace payrollCaseStudy
@@ -40,8 +41,23 @@ namespace payrollCaseStudy
 
         public decimal CalculateDeductions(Paycheck paycheck)
         {
-            return 0.0m;
+            decimal result = 0.0m;
+
+            int fridays = NumberOfFridaysInPayPeriod(paycheck.PayPeriodStartDate, paycheck.PayPeriodEndDate);
+            result = fridays * dues;
+
+            return result;
         }
 
+        private int NumberOfFridaysInPayPeriod(DateTime startDate, DateTime endDate)
+        {
+            int result = 0;
+            for(DateTime day = startDate; day < endDate; day = day.AddDays(1))
+            {
+                if(day.DayOfWeek == DayOfWeek.Friday) 
+                    result++;
+            }
+            return result;
+        }
     }
 }
