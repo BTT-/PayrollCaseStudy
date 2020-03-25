@@ -31,6 +31,11 @@ namespace payrollCaseStudy
             Method.Pay(paycheck);
         }
 
+        internal DateTime GetPayPeriodStartDate(DateTime payDate)
+        {
+            return Schedule.GetStartDate(payDate);
+        }
+
         public bool IsPayDay(DateTime payDate)
         {
             return Schedule.IsPayDay(payDate);

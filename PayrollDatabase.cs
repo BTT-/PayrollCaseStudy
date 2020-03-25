@@ -5,6 +5,18 @@ namespace payrollCaseStudy
     {
         private static Hashtable employees = new Hashtable();
         private static Hashtable unionmembers = new Hashtable();
+
+        static PayrollDatabase()
+        {
+            InitializeDatabase();
+        }
+
+        internal static void InitializeDatabase()
+        {
+            employees = new Hashtable();
+            unionmembers = new Hashtable();
+        }
+
         public static void AddEmployee(int id, Employee employee)
         {
             employees[id] = employee;

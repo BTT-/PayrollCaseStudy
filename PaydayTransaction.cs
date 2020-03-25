@@ -22,7 +22,8 @@ namespace payrollCaseStudy
                 var e = PayrollDatabase.GetEmployee(empId);
                 if(e.IsPayDay(payDate))
                 {
-                    Paycheck pc = new Paycheck(payDate);
+                    var startDate = e.GetPayPeriodStartDate(payDate);
+                    Paycheck pc = new Paycheck(startDate, payDate);
                     paychecks[empId] = pc;
                     e.Payday(pc);
                 }

@@ -1,3 +1,4 @@
+using System.Reflection.Emit;
 using System;
 using NUnit.Framework;
 
@@ -6,6 +7,12 @@ namespace payrollCaseStudy
     [TestFixture]
     public class TransactionTests
     {
+        [SetUp]
+        public void Setup()
+        {
+            PayrollDatabase.InitializeDatabase();
+        }
+
         [Test]
         public void TestAddSalariedEmployee()
         {
@@ -470,11 +477,34 @@ namespace payrollCaseStudy
             ValidatePaycheck(pt, empId, payDate, 1000m + 0.5m * 100m);
         } 
 
+        [Test]
+        public void SalariedUnionMemberDues()
+        {
+            int empId = 1;
+            var t = new AddSalariedEmployee(empId, "Bob", "Home", 1000.00m);
+            t.Execute();
+            int memberId = 7734;
+            var cmt = new ChangeMemberTransaction(empId, memberId, 9.42m);
+            cmt.Execute();
+
+            DateTime payDate = new DateTime(2020, 02, 29);
+            var pt = new PaydayTransaction(payDate);
+            pt.Execute();
+            Paycheck pc = pt.GetPaycheck(empId);
+            Assert.That(pc, Is.Not.Null);
+            Assert.That(pc.PayPeriodEndDate, Is.EqualTo(payDate));
+            Assert.That(pc.GrossPay, Is.EqualTo(1000m));
+            
+            Assert.That(false);
+
+
+        }
+
         private void ValidatePaycheck(PaydayTransaction pt, int empId, DateTime payDate, decimal pay)
         {
             Paycheck pc = pt.GetPaycheck(empId);
             Assert.That(pc, Is.Not.Null);
-            Assert.That(pc.PayDate, Is.EqualTo(payDate));
+            Assert.That(pc.PayPeriodEndDate, Is.EqualTo(payDate));
             Assert.That(pc.GrossPay, Is.EqualTo(pay));
             Assert.That(pc.Deductions, Is.EqualTo(0.0m));
             Assert.That(pc.NetPay, Is.EqualTo(pay));

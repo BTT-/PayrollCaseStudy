@@ -24,14 +24,13 @@ namespace payrollCaseStudy
             timeCards[timeCard.Date] = timeCard;
         }
 
-        public decimal CalculatePay(Paycheck paycheck)
+        public override decimal CalculatePay(Paycheck paycheck)
         {
             decimal result = 0m;
             foreach(TimeCard tc in timeCards.Values)
             {
-                if(IsInPayPeriod(tc, paycheck.PayDate))
+                if(IsInPayPeriod(tc.Date, paycheck))
                 {
-
                     result += CalculatePayForTimeCard(tc);
                 }
             }
@@ -54,14 +53,6 @@ namespace payrollCaseStudy
         private decimal CalculateRegularHours(TimeCard tc, decimal overtime)
         {
             return Convert.ToDecimal(tc.Hours) - overtime;
-        }
-
-        private bool IsInPayPeriod(TimeCard tc, DateTime payDate)
-        {
-            DateTime payPeriodStart = payDate.AddDays(-5);
-            DateTime payPeriodEnd = payDate;
-
-            return tc.Date <= payPeriodEnd && tc.Date >= payPeriodStart;
         }
     }
 }

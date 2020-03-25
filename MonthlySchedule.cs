@@ -11,6 +11,11 @@ namespace payrollCaseStudy
             return (m1 != m2);
         }
 
+        public DateTime GetStartDate(DateTime payDate)
+        {
+            return new DateTime(payDate.Year, payDate.Month, 1);
+        }
+
         public bool IsPayDay(DateTime payDate)
         {
             return IsLastDayOfMonth(payDate);

@@ -7,11 +7,13 @@ namespace payrollCaseStudy
         public decimal GrossPay {get; set;}
         public decimal Deductions {get; set;}
         public decimal NetPay {get; set;}
-        public DateTime PayDate {get;}
+        public DateTime PayPeriodEndDate {get;}
+        public DateTime PayPeriodStartDate { get; internal set; }
 
-        public Paycheck(DateTime payDate)
+        public Paycheck(DateTime startDate, DateTime endDate)
         {
-            PayDate = payDate;
+            PayPeriodEndDate = endDate;
+            PayPeriodStartDate = startDate;
         }
 
     }

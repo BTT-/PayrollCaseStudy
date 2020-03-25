@@ -1,7 +1,18 @@
+using System;
+
 namespace payrollCaseStudy
 {
-    public interface PaymentClassification
+    public abstract class PaymentClassification
     {
-         decimal CalculatePay(Paycheck paycheck);
+        public abstract decimal CalculatePay(Paycheck paycheck);
+
+        public bool IsInPayPeriod(DateTime date, Paycheck paycheck)
+        {
+            var payPeriodEndDate = paycheck.PayPeriodEndDate;
+            var payPeriodStartDate = paycheck.PayPeriodStartDate;
+
+            return (date >= payPeriodStartDate) && (date <= payPeriodEndDate);
+        }
+
     }
 }

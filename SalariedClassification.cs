@@ -9,7 +9,7 @@ namespace payrollCaseStudy
             Salary = salary;
         }
 
-        public decimal CalculatePay(Paycheck paycheck)
+        public override decimal CalculatePay(Paycheck paycheck)
         {
             return Salary;
         }
