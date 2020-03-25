@@ -516,14 +516,10 @@ namespace payrollCaseStudy
             DateTime payDate = new DateTime(2020, 02, 29);
             var pt = new PaydayTransaction(payDate);
             pt.Execute();
-            Paycheck pc = pt.GetPaycheck(empId);
-            Assert.That(pc, Is.Not.Null);
-            Assert.That(pc.PayPeriodEndDate, Is.EqualTo(payDate));
-            Assert.That(pc.GrossPay, Is.EqualTo(1000m));
+
             //4 Fridays in Feb 2020
             var unionDues = 4m*9.42m;
-            Assert.That(pc.Deductions, Is.EqualTo(unionDues));
-            Assert.That(pc.NetPay, Is.EqualTo(1000.0m - unionDues));
+            ValidatePaycheck(pt, empId, payDate, 1000m, unionDues);
         }
 
         [Test]
@@ -539,14 +535,11 @@ namespace payrollCaseStudy
             DateTime payDate = new DateTime(2020, 01, 31);
             var pt = new PaydayTransaction(payDate);
             pt.Execute();
-            Paycheck pc = pt.GetPaycheck(empId);
-            Assert.That(pc, Is.Not.Null);
-            Assert.That(pc.PayPeriodEndDate, Is.EqualTo(payDate));
-            Assert.That(pc.GrossPay, Is.EqualTo(1000m));
+
             //5 Fridays in Jan
             var unionDues = 5m*9.42m;
-            Assert.That(pc.Deductions, Is.EqualTo(unionDues));
-            Assert.That(pc.NetPay, Is.EqualTo(1000.0m - unionDues));
+            ValidatePaycheck(pt, empId, payDate, 1000m, unionDues);
+
         }
 
         [Test]
@@ -562,25 +555,17 @@ namespace payrollCaseStudy
             DateTime payDate = new DateTime(2020, 01, 24);
             var pt = new PaydayTransaction(payDate);
             pt.Execute();
-            Paycheck pc = pt.GetPaycheck(empId);
-            Assert.That(pc, Is.Not.Null);
-            Assert.That(pc.PayPeriodEndDate, Is.EqualTo(payDate));
-            Assert.That(pc.GrossPay, Is.EqualTo(1000m));
             //2 Fridays 
             var unionDues = 2m*9.42m;
-            Assert.That(pc.Deductions, Is.EqualTo(unionDues));
-            Assert.That(pc.NetPay, Is.EqualTo(1000.0m - unionDues));
+
+            ValidatePaycheck(pt, empId, payDate, 1000m, unionDues);
 
             payDate = new DateTime(2020, 01, 10);
             pt = new PaydayTransaction(payDate);
             pt.Execute();
-            pc = pt.GetPaycheck(empId);
-            Assert.That(pc, Is.Not.Null);
-            Assert.That(pc.PayPeriodEndDate, Is.EqualTo(payDate));
-            Assert.That(pc.GrossPay, Is.EqualTo(1000m));
 
-            Assert.That(pc.Deductions, Is.EqualTo(unionDues));
-            Assert.That(pc.NetPay, Is.EqualTo(1000.0m - unionDues));
+            ValidatePaycheck(pt, empId, payDate, 1000m, unionDues);
+
         }
 
         [Test]
@@ -596,25 +581,72 @@ namespace payrollCaseStudy
             DateTime payDate = new DateTime(2020, 01, 24);
             var pt = new PaydayTransaction(payDate);
             pt.Execute();
-            Paycheck pc = pt.GetPaycheck(empId);
-            Assert.That(pc, Is.Not.Null);
-            Assert.That(pc.PayPeriodEndDate, Is.EqualTo(payDate));
-            Assert.That(pc.GrossPay, Is.EqualTo(0m));
-            //1 Fridays 
+
+            //1 Friday
             var unionDues = 9.42m;
-            Assert.That(pc.Deductions, Is.EqualTo(9.42m));
-            Assert.That(pc.NetPay, Is.EqualTo(-unionDues));
+            ValidatePaycheck(pt, empId, payDate, 0m, unionDues);
+
         }
 
+        [Test]
+        public void TestHourlyUnionMemberServiceCharge()
+        {
+            int empId = 12;
+            var t = new AddHourlyEmployee(empId, "Bill", "Home", 15.24m);
+            t.Execute();
 
-        private void ValidatePaycheck(PaydayTransaction pt, int empId, DateTime payDate, decimal pay)
+            int memberId = 1337;
+            var cmt = new ChangeMemberTransaction(empId, memberId, 9.42m);
+            cmt.Execute();
+            DateTime payDate = new DateTime(2020, 03, 20);
+            ServiceChargeTransaction sct = new ServiceChargeTransaction(memberId, payDate, 19.42m);
+            sct.Execute();
+            TimeCardTransaction tct = new TimeCardTransaction(payDate, 8.0, empId);
+            tct.Execute();
+            PaydayTransaction pt = new PaydayTransaction(payDate);
+            pt.Execute();
+            Paycheck pc = pt.GetPaycheck(empId);
+
+            ValidatePaycheck(pt, empId, payDate, 8*15.24m, 9.42m+19.42m);
+        }
+
+        [Test]
+        public void TestServiceChargesSpanningMultiplePayPeriods()
+        {
+            int empId = 1;
+            var t = new AddHourlyEmployee(empId, "Bill", "Home", 15.23m);
+            t.Execute();
+
+            int memberId = 1234;
+            var cmt = new ChangeMemberTransaction(empId, memberId, 9.42m);
+            cmt.Execute();
+
+            var payDate = new DateTime(2020,03,20);
+            var earlyDate = new DateTime(2020, 03, 13);
+            var lateDate = new DateTime(2020, 03, 27);
+
+            var sct = new ServiceChargeTransaction(memberId, payDate, 19.42m);
+            sct.Execute();
+            var sctEarly = new ServiceChargeTransaction(memberId, earlyDate, 100.00m);
+            sctEarly.Execute();
+            var sctLate = new ServiceChargeTransaction(memberId, lateDate, 100.00m);
+            sctLate.Execute();
+            var tct = new TimeCardTransaction(payDate, 8.0, empId);
+            tct.Execute();
+            var pt = new PaydayTransaction(payDate);
+            pt.Execute();
+            ValidatePaycheck(pt, empId, payDate, 8 * 15.23m, 9.42m+19.42m);
+
+        }
+
+        private void ValidatePaycheck(PaydayTransaction pt, int empId, DateTime payDate, decimal pay, decimal deductions = 0m)
         {
             Paycheck pc = pt.GetPaycheck(empId);
             Assert.That(pc, Is.Not.Null);
             Assert.That(pc.PayPeriodEndDate, Is.EqualTo(payDate));
             Assert.That(pc.GrossPay, Is.EqualTo(pay));
-            Assert.That(pc.Deductions, Is.EqualTo(0.0m));
-            Assert.That(pc.NetPay, Is.EqualTo(pay));
+            Assert.That(pc.Deductions, Is.EqualTo(deductions));
+            Assert.That(pc.NetPay, Is.EqualTo(pay - deductions));
         }
     }
 }
