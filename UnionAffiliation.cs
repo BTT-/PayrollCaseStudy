@@ -46,6 +46,14 @@ namespace payrollCaseStudy
             int fridays = NumberOfFridaysInPayPeriod(paycheck.PayPeriodStartDate, paycheck.PayPeriodEndDate);
             result = fridays * dues;
 
+            foreach(ServiceCharge charge in servicecharges.Values)
+            {
+                if(charge.Date.IsInPayPeriod(paycheck.PayPeriodStartDate, paycheck.PayPeriodEndDate))
+                {
+                    result += charge.Amount;
+                }
+            }
+
             return result;
         }
 

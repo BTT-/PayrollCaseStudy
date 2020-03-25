@@ -26,12 +26,12 @@ namespace payrollCaseStudy
             salesReceipts[receipt.Date] = receipt;
         }
 
-        public override decimal CalculatePay(Paycheck paycheck)
+        public decimal CalculatePay(Paycheck paycheck)
         {
             var result = Salary;
             foreach(SalesReceipt sr in salesReceipts.Values)
             {
-                if(IsInPayPeriod(sr.Date, paycheck))
+                if(sr.Date.IsInPayPeriod(paycheck.PayPeriodStartDate, paycheck.PayPeriodEndDate))
                 {
                     result += CommissionRate * sr.Amount;
                 }

@@ -24,12 +24,12 @@ namespace payrollCaseStudy
             timeCards[timeCard.Date] = timeCard;
         }
 
-        public override decimal CalculatePay(Paycheck paycheck)
+        public decimal CalculatePay(Paycheck paycheck)
         {
             decimal result = 0m;
             foreach(TimeCard tc in timeCards.Values)
             {
-                if(IsInPayPeriod(tc.Date, paycheck))
+                if(tc.Date.IsInPayPeriod(paycheck.PayPeriodStartDate, paycheck.PayPeriodEndDate))
                 {
                     result += CalculatePayForTimeCard(tc);
                 }
